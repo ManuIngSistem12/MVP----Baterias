@@ -1,4 +1,4 @@
-package autobaterias.demo.entities;
+package autobaterias.demo.entidades;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,6 +25,6 @@ public class Rol {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "name", nullable = false, unique = true, length = 50)
-    private String name;
+    @Column(name = "nombre", nullable = false, unique = true, length = 50)
+    private String nombre;
 }
