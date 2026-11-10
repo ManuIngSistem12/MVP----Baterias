@@ -7,6 +7,7 @@ import autobaterias.demo.excepciones.ConflictoExcepcion;
 import autobaterias.demo.excepciones.RecursoNoEncontradoExcepcion;
 import autobaterias.demo.mapeadores.RolMapeador;
 import autobaterias.demo.repositorios.IRolRepositorio;
+import autobaterias.demo.repositorios.IUsuarioRepositorio;
 import autobaterias.demo.servicios.IRolServicio;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class RolServicioImpl implements IRolServicio {
     private static final String RECURSO = "Rol";
 
     private final IRolRepositorio rolRepositorio;
+    private final IUsuarioRepositorio usuarioRepositorio;
     private final RolMapeador rolMapeador;
 
     @Override
@@ -60,7 +62,11 @@ public class RolServicioImpl implements IRolServicio {
     @Override
     @Transactional
     public void eliminar(Integer id) {
-        rolRepositorio.delete(obtenerRol(id));
+        Rol rol = obtenerRol(id);
+        if (usuarioRepositorio.existsByRolId(id)) {
+            throw new ConflictoExcepcion("El rol '%s' está asignado a usuarios y no se puede eliminar".formatted(rol.getNombre()));
+        }
+        rolRepositorio.delete(rol);
     }
 
     private Rol obtenerRol(Integer id) {
