@@ -1,4 +1,4 @@
-package autobaterias.demo.entities;
+package autobaterias.demo.entidades;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,41 +16,41 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "users")
+@Table(name = "usuario")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "identity", nullable = false, unique = true, length = 50)
-    private String identity;
+    @Column(name = "identificacion", nullable = false, unique = true, length = 50)
+    private String identificacion;
 
-    @Column(name = "name", nullable = false, length = 50)
-    private String name;
+    @Column(name = "nombre", nullable = false, length = 50)
+    private String nombre;
 
-    @Column(name = "last_name", nullable = false, length = 50)
-    private String lastName;
+    @Column(name = "apellido", nullable = false, length = 50)
+    private String apellido;
 
-    @Column(name = "number", nullable = false, length = 50)
-    private String number;
+    @Column(name = "telefono", nullable = false, length = 50)
+    private String telefono;
 
-    @Column(name = "email", nullable = false, unique = true, length = 100)
-    private String email;
+    @Column(name = "correo", nullable = false, unique = true, length = 100)
+    private String correo;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "rol_id", nullable = false)
     private Rol rol;
 
-    @Column(name = "password", nullable = false, length = 300)
-    private String password;
+    @Column(name = "contrasena", nullable = false, length = 300)
+    private String contrasena;
 
     @Builder.Default
-    @Column(name = "active", nullable = false)
-    private Boolean active = true;
+    @Column(name = "activo", nullable = false)
+    private Boolean activo = true;
 }
