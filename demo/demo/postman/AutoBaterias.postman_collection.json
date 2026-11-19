@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "AutoBaterias - API",
-    "description": "Endpoints de /roles y /usuarios con casos correctos y de error. Ejecutar en orden. Respuestas de error: {\"estado\", \"mensaje\"}.",
+    "description": "Endpoints de /roles, /usuarios y /baterias con casos correctos y de error. Ejecutar en orden. Respuestas de error: {\"estado\", \"mensaje\"}.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -16,6 +16,10 @@
     {
       "key": "rolId",
       "value": "2"
+    },
+    {
+      "key": "bateriaId",
+      "value": "1"
     }
   ],
   "item": [
@@ -855,6 +859,506 @@
               ],
               "path": [
                 "usuarios",
+                "9999"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Baterias",
+      "item": [
+        {
+          "name": "Crear batería",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/baterias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baterias"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"MAC-42\",\n  \"modelo\": \"Silver 42\",\n  \"marcaId\": 1,\n  \"precio\": 450000.0,\n  \"mesesGarantia\": 12,\n  \"existencias\": 8\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) pm.collectionVariables.set('bateriaId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear batería con código duplicado (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/baterias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baterias"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"MAC-42\",\n  \"modelo\": \"Otra\",\n  \"marcaId\": 1,\n  \"precio\": 450000.0,\n  \"mesesGarantia\": 12,\n  \"existencias\": 8\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear batería con marca inexistente (404)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/baterias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baterias"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"X-1\",\n  \"modelo\": \"Silver 42\",\n  \"marcaId\": 99,\n  \"precio\": 450000.0,\n  \"mesesGarantia\": 12,\n  \"existencias\": 8\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear batería con valores negativos (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/baterias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baterias"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"\",\n  \"modelo\": \"M\",\n  \"marcaId\": 1,\n  \"precio\": -5,\n  \"mesesGarantia\": -1,\n  \"existencias\": -2\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear batería con precio de 3 decimales (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/baterias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baterias"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"X-2\",\n  \"modelo\": \"Silver 42\",\n  \"marcaId\": 1,\n  \"precio\": 10.123,\n  \"mesesGarantia\": 12,\n  \"existencias\": 8\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear segunda batería",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/baterias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baterias"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"WIL-60\",\n  \"modelo\": \"Power 60\",\n  \"marcaId\": 2,\n  \"precio\": 520000,\n  \"mesesGarantia\": 18,\n  \"existencias\": 5\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar baterías",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/baterias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baterias"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buscar batería por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/baterias/{{bateriaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baterias",
+                "{{bateriaId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buscar batería inexistente (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/baterias/9999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baterias",
+                "9999"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Actualizar batería",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/baterias/{{bateriaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baterias",
+                "{{bateriaId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"MAC-42\",\n  \"modelo\": \"Silver 42\",\n  \"marcaId\": 1,\n  \"precio\": 480000.5,\n  \"mesesGarantia\": 18,\n  \"existencias\": 3\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Actualizar batería con código de otra (409)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/baterias/{{bateriaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baterias",
+                "{{bateriaId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"WIL-60\",\n  \"modelo\": \"Silver 42\",\n  \"marcaId\": 1,\n  \"precio\": 450000.0,\n  \"mesesGarantia\": 12,\n  \"existencias\": 8\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Actualizar batería inexistente (404)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/baterias/9999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baterias",
+                "9999"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"MAC-42\",\n  \"modelo\": \"Silver 42\",\n  \"marcaId\": 1,\n  \"precio\": 450000.0,\n  \"mesesGarantia\": 12,\n  \"existencias\": 8\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Eliminar batería (borrado lógico)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/baterias/{{bateriaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baterias",
+                "{{bateriaId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buscar batería eliminada (activo = false)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/baterias/{{bateriaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baterias",
+                "{{bateriaId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Eliminar batería inexistente (404)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/baterias/9999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baterias",
                 "9999"
               ]
             }
