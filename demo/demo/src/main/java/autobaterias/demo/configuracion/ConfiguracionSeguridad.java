@@ -12,7 +12,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class ConfiguracionSeguridad {
 
-    private static final String[] RUTAS_PUBLICAS_TEMPORALES = {"/usuarios/**", "/roles/**", "/error"};
+    private static final String[] RUTAS_PUBLICAS_TEMPORALES = {"/usuarios/**", "/roles/**", "/baterias/**", "/error"};
 
     @Bean
     public SecurityFilterChain cadenaFiltrosSeguridad(HttpSecurity http) throws Exception {
