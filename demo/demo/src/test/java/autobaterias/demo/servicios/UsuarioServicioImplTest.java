@@ -114,7 +114,7 @@ class UsuarioServicioImplTest {
 
         assertThatThrownBy(() -> usuarioServicio.guardar(crearDto("ana@autobaterias.com", 99)))
                 .isInstanceOf(RecursoNoEncontradoExcepcion.class)
-                .hasMessage("Rol con id 99 no encontrado")
+                .hasMessage("Rol con id 99 no existe")
                 .extracting("estado").isEqualTo(HttpStatus.NOT_FOUND);
         verify(usuarioRepositorio, never()).save(any());
         verify(codificadorContrasena, never()).encode(any());
@@ -138,7 +138,7 @@ class UsuarioServicioImplTest {
 
         assertThatThrownBy(() -> usuarioServicio.eliminar(404))
                 .isInstanceOf(RecursoNoEncontradoExcepcion.class)
-                .hasMessage("Usuario con id 404 no encontrado");
+                .hasMessage("Usuario con id 404 no existe");
     }
 
     @Test
