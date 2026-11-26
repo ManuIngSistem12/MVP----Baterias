@@ -184,7 +184,119 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Incluye estado y mensaje de error', () => { const b = pm.response.json(); pm.expect(b.estado).to.eql(400); pm.expect(b.mensaje).to.include('nombre'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear rol sin campo nombre (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/roles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "roles"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Indica campo faltante nombre', () => pm.expect(pm.response.json().mensaje).to.include('nombre'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear rol con nombre > 50 caracteres (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/roles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "roles"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"ROL_CON_NOMBRE_DEMASIADO_LARGO_PARA_EL_LIMITE_PERMITIDO_51\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Indica error en nombre', () => pm.expect(pm.response.json().mensaje).to.include('nombre'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear rol con JSON mal formado (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/roles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "roles"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nombre\":"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Mensaje solicitud mal formada', () => pm.expect(pm.response.json().mensaje).to.eql('Solicitud mal formada'));"
                 ]
               }
             }
@@ -601,6 +713,108 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear usuario sin contraseña (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identificacion\": \"444\",\n  \"nombre\": \"Luis\",\n  \"apellido\": \"Perez\",\n  \"telefono\": \"3001234567\",\n  \"correo\": \"luis@autobaterias.com\",\n  \"rolId\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Indica dato faltante contrasena', () => pm.expect(pm.response.json().mensaje).to.include('contrasena'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear usuario con rolId <= 0 (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identificacion\": \"555\",\n  \"nombre\": \"Luis\",\n  \"apellido\": \"Perez\",\n  \"telefono\": \"3001234567\",\n  \"correo\": \"luis2@autobaterias.com\",\n  \"rolId\": 0,\n  \"contrasena\": \"Secreta123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Indica rolId inválido', () => pm.expect(pm.response.json().mensaje).to.include('rolId'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verificar no modificación tras rechazos POST /usuarios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('No se crearon usuarios rechazados', () => { const correos = pm.response.json().map(u => u.correo); pm.expect(correos).to.not.include('otro@autobaterias.com'); pm.expect(correos).to.not.include('b@autobaterias.com'); pm.expect(correos).to.not.include('c@autobaterias.com'); pm.expect(correos).to.not.include('luis@autobaterias.com'); });"
                 ]
               }
             }
