@@ -1276,6 +1276,80 @@
           ]
         },
         {
+          "name": "Crear batería sin campos obligatorios (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/baterias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baterias"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Indica campos faltantes', () => { const m = pm.response.json().mensaje; pm.expect(m).to.include('codigo'); pm.expect(m).to.include('modelo'); pm.expect(m).to.include('marcaId'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear batería con valores límite en cero (201)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/baterias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baterias"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \" lim-0 \",\n  \"modelo\": \"Base 0\",\n  \"marcaId\": 1,\n  \"precio\": 0.00,\n  \"mesesGarantia\": 0,\n  \"existencias\": 0\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Normaliza código a mayúsculas', () => pm.expect(pm.response.json().codigo).to.eql('LIM-0'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Crear segunda batería",
           "request": {
             "method": "POST",
@@ -1469,6 +1543,101 @@
           ]
         },
         {
+          "name": "Actualizar batería con precio negativo (400)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/baterias/{{bateriaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baterias",
+                "{{bateriaId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"MAC-42\",\n  \"modelo\": \"Silver 42\",\n  \"marcaId\": 1,\n  \"precio\": -10.0,\n  \"mesesGarantia\": 12,\n  \"existencias\": 8\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Indica error en precio', () => pm.expect(pm.response.json().mensaje).to.include('precio'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verificar no modificación tras rechazos en batería (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/baterias/{{bateriaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baterias",
+                "{{bateriaId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Conserva código y precio previos al rechazo', () => { const b = pm.response.json(); pm.expect(b.codigo).to.eql('MAC-42'); pm.expect(b.precio).to.eql(480000.5); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buscar batería con id no numérico (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/baterias/abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "baterias",
+                "abc"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Actualizar batería inexistente (404)",
           "request": {
             "method": "PUT",
@@ -1555,7 +1724,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Batería marcada inactiva (activo = false)', () => pm.expect(pm.response.json().activo).to.eql(false));"
                 ]
               }
             }
